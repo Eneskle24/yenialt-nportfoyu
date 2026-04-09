@@ -6,16 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Portföy Yönetim</title>
 
-    <!-- PWA Installation Requirements -->
     <link rel="manifest"
         href="data:application/manifest+json,%7B%22name%22%3A%22Kasa%20%28Portf%C3%B6y%29%22%2C%22short_name%22%3A%22Kasa%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%2309090b%22%2C%22theme_color%22%3A%22%2310b981%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20100%20100%27%253E%253Crect%20width%3D%27100%27%20height%3D%27100%27%20fill%3D%27%252310b981%27%20rx%3D%2720%27%2F%253E%253Cpath%20fill%3D%27%2523fff%27%20d%3D%27M50%2020a30%2030%200%201%200%200%2060%2030%2030%200%200%200%200-60zm0%2010a20%2020%200%201%201%200%2040%2020%2020%200%200%201%200-40z%27%2F%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
     <script>
-        if ('serviceWorker' in navigator) {
-            const swCode = "self.addEventListener('fetch', function(event) {});";
-            const blob = new Blob([swCode], { type: 'text/javascript' });
-            navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(console.error);
-        }
-        
         // Anti-flicker for theme loading
         if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
@@ -28,31 +21,29 @@
     <link rel="apple-touch-icon"
         href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%2310b981' rx='20'/%3E%3Cpath fill='%23fff' d='M50 20a30 30 0 1 0 0 60 30 30 0 0 0 0-60zm0 10a20 20 0 1 1 0 40 20 20 0 0 1 0-40z'/%3E%3C/svg%3E">
 
-    <!-- Tailwind & Fonts -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- React & Babel -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/react-is@18/umd/react-is.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-    <!-- Recharts -->
     <script src="https://unpkg.com/recharts/umd/Recharts.js"></script>
 
-    <!-- CryptoJS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 
     <script>
         tailwind.config = {
-            darkMode: 'class', // Temayı tetiklemek için class kullanıyoruz
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
+                        background: '#040608',
                         primary: '#10b981',
                         primary_dark: '#059669',
                     },
@@ -344,7 +335,6 @@
                         const step = Math.ceil(results.length / maxPoints);
                         sampled = results.filter((_, i) => i % step === 0);
                     }
-                    // Sondaki data (en günceli) hep gözüksün istiyoruz
                     if (results.length > 0 && sampled[sampled.length - 1] !== results[results.length - 1]) {
                         sampled.push(results[results.length - 1]);
                     }
@@ -425,8 +415,11 @@
                         }
                     }
                 };
+
                 const handleScroll = (e) => {
-                    if (isOpen && !e.target.closest('.custom-select-portal')) setIsOpen(false);
+                    if (isOpen && !e.target.closest('.custom-select-portal')) {
+                        setIsOpen(false);
+                    }
                 };
 
                 if (isOpen) {
@@ -525,7 +518,6 @@
         // --- GRAFİK BİLEŞENİ (Dairesel Dağılım) ---
         const ChartLegend = ({ distribution }) => {
             if (!distribution || distribution.length === 0) return null;
-            // Genişletilmiş modern ve uyumlu renk paleti
             const colors = ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4', '#ec4899', '#14b8a6', '#f97316', '#6366f1'];
 
             return (
@@ -751,7 +743,7 @@
 
             const [githubConfig, setGithubConfig] = useState(() => {
                 const saved = localStorage.getItem('gh_config_v3');
-                return saved ? JSON.parse(saved) : { token: '', username: 'turkyeray', repo: 'portfoy-kasa' };
+                return saved ? JSON.parse(saved) : { token: '', username: '', repo: '' };
             });
             const [formConfig, setFormConfig] = useState(githubConfig);
 
@@ -761,7 +753,6 @@
             const [authError, setAuthError] = useState("");
             const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
 
-            // YENİ RAKAMLAR: Ons (XAU) ve Banka Gram altın eklendi. (Fiyatlar temsilidir, API'den güncellenir)
             const [rates, setRates] = useState({ USD: 32.50, EUR: 35.20, XAU: 2350, BANK_GRAM: 2450, GRAM: 2475, ATA: 17000, TRY: 1, STOCK: 1 });
             const [currencyLabels, setCurrencyLabels] = useState({ USD: 'Dolar', EUR: 'Euro', TRY: 'TL', XAU: 'Ons ($)', BANK_GRAM: 'Banka Gr', GRAM: 'Fiziki Gr', ATA: 'Ata', STOCK: 'Hisse' });
 
@@ -871,7 +862,7 @@
                     });
 
                     if (response.status === 404) {
-                        setAppState('create_vault');
+                        setAppState('set_password');
                         return;
                     }
                     if (!response.ok) throw new Error("GitHub erişim reddedildi.");
@@ -983,7 +974,6 @@
                 try {
                     if (showLoading) setIsLoadingRates(true);
                     
-                    // Binance'den USDTTRY ve EURUSDT, TradingView'dan ise XAUUSD çekiyoruz (Eşzamanlı)
                     const binancePromise = fetch('https://api.binance.com/api/v3/ticker/price?symbols=%5B%22USDTTRY%22,%22EURUSDT%22%5D').then(r => r.json());
                     const tvPromise = fetch('https://scanner.tradingview.com/global/scan', {
                         method: 'POST',
@@ -995,12 +985,10 @@
                     
                     let paxg = 0, usdtTry = 0, eurUsdt = 0;
                     
-                    // TradingView XAUUSD
                     if (tvData && tvData.data && tvData.data.length > 0 && tvData.data[0].d) {
                         paxg = parseFloat(tvData.data[0].d[0]);
                     }
 
-                    // Binance Dövizler
                     if (binanceData && Array.isArray(binanceData)) {
                         binanceData.forEach(item => {
                             if (item.symbol === 'USDTTRY') usdtTry = parseFloat(item.price);
@@ -1019,7 +1007,6 @@
                             
                             newRates.XAU = parseFloat(paxg.toFixed(2));
                             
-                            // Gram altın = Ons fiyatı / 31.1034768 * Dolar Kuru
                             const spotGramGoldTry = (paxg / 31.1034768) * usdtTry;
                             
                             newRates.BANK_GRAM = parseFloat(spotGramGoldTry.toFixed(2)); // Banka Gramı
@@ -1029,7 +1016,6 @@
                             
                             newRates.ATA = parseFloat((newRates.GRAM * 6.88).toFixed(2));
 
-                            // Veritabanına arkaplanda otonom kayıt at
                             saveRateToDB(newRates.XAU, newRates.GRAM);
 
                             return newRates;
@@ -1045,9 +1031,9 @@
             // OTONOM (2 Saniyede bir) ÇALIŞTIRMA
             useEffect(() => {
                 if (appState === 'app') {
-                    fetchLiveRates(true); // ilk çekim (yükleniyor animasyonu var)
+                    fetchLiveRates(true); 
                     const interval = setInterval(() => {
-                        fetchLiveRates(false); // sonsuz çekim (arkaplanda, animasyonsuz)
+                        fetchLiveRates(false); 
                     }, 2000);
                     return () => clearInterval(interval);
                 }
@@ -1584,16 +1570,7 @@
                                                                                         <CustomSelect
                                                                                             value={sub.type}
                                                                                             options={currencyLabels}
-                                                                                            onChange={(newVal) => updatePortfolioAsset(person.id, asset.id, a => ({
-                                                                                                ...a,
-                                                                                                subItems: a.subItems.map(s => {
-                                                                                                    if (s.id === sub.id) {
-                                                                                                        const isBlankOrLabel = !s.name || Object.values(currencyLabels).includes(s.name) || Object.keys(currencyLabels).includes(s.name);
-                                                                                                        return { ...s, type: newVal, name: isBlankOrLabel ? currencyLabels[newVal] : s.name };
-                                                                                                    }
-                                                                                                    return s;
-                                                                                                })
-                                                                                            }))}
+                                                                                            onChange={(newVal) => updateSubItem(person.id, asset.id, sub.id, 'type', newVal)}
                                                                                             className="flex-[1.5] bg-slate-100 dark:bg-black/30 text-slate-800 dark:text-white min-w-[55px] rounded-r-lg"
                                                                                         />
                                                                                     </div>
